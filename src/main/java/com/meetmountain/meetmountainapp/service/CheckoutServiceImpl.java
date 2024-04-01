@@ -14,12 +14,12 @@ import java.util.Set;
 import java.util.UUID;
 
 @Service
-public class CheckoutServiceImpl implements CheckoutService{
+public class CheckoutServiceImpl implements CheckoutService {
 
     private CustomerRepository customerRepository;
 
     @Autowired
-    public CheckoutServiceImpl(CustomerRepository customerRepository){
+    public CheckoutServiceImpl(CustomerRepository customerRepository) {
         this.customerRepository = customerRepository;
     }
 
@@ -33,7 +33,7 @@ public class CheckoutServiceImpl implements CheckoutService{
     @Override
     @Transactional
     public PurchaseResponse placeOrder(Purchase purchase) {
-        Order  order = purchase.getOrder();
+        Order order = purchase.getOrder();
 
         String orderTrackingNumber = generateOrderTrackingNumber();
         order.setOrderTrackingNumber(orderTrackingNumber);
