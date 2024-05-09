@@ -1,9 +1,6 @@
 package com.meetmountain.meetmountainapp.config;
 
-import com.meetmountain.meetmountainapp.entity.Country;
-import com.meetmountain.meetmountainapp.entity.Product;
-import com.meetmountain.meetmountainapp.entity.ProductCategory;
-import com.meetmountain.meetmountainapp.entity.State;
+import com.meetmountain.meetmountainapp.entity.*;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.metamodel.EntityType;
@@ -43,6 +40,8 @@ public class MyDataRestConfig implements RepositoryRestConfigurer {
         disableHttpMethods(ProductCategory.class, config, theUnsupportedActions);
 
         disableHttpMethods(Country.class, config, theUnsupportedActions);
+        disableHttpMethods(Order.class, config, theUnsupportedActions);
+
         disableHttpMethods(State.class, config, theUnsupportedActions);
 
         //call an internal helper method
