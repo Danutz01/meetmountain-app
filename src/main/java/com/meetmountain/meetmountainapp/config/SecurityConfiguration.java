@@ -37,6 +37,7 @@ public class SecurityConfiguration {
         // we are not using Cookies for session tracking >> disable CSRF
         http.csrf(AbstractHttpConfigurer::disable);
 
+        http.csrf(csrf -> csrf.disable());
         return http.build();
     }
 }
