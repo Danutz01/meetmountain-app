@@ -20,7 +20,7 @@ public class OrderItem {
     private Long id;
 
     @Column(name = "image_url")
-    private String imageUrl;
+    private byte[] imageUrl;
 
     @Column(name = "unit_price")
     private BigDecimal unitPrice;

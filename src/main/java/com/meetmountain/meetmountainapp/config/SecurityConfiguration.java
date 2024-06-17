@@ -11,17 +11,16 @@ import org.springframework.web.accept.ContentNegotiationStrategy;
 import org.springframework.web.accept.HeaderContentNegotiationStrategy;
 
 @Configuration
-
 public class SecurityConfiguration {
 
     @Bean
     protected SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
-        //protect endpoint /api/orders
+        //protect endpoint /api/orders și /api/products/add
         http.authorizeHttpRequests(requests ->
                         requests
-                                .requestMatchers("/api/orders/**")
-                                .authenticated()
+                                .requestMatchers("/api/products/add").authenticated()
+                                .requestMatchers("/api/orders/**").authenticated()
                                 .anyRequest().permitAll())
                 .oauth2ResourceServer(oauth2ResourceServer -> oauth2ResourceServer.jwt(Customizer.withDefaults()));
 

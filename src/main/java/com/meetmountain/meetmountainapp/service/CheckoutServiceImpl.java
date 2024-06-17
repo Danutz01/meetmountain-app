@@ -26,55 +26,50 @@ public class CheckoutServiceImpl implements CheckoutService {
     public CheckoutServiceImpl(CustomerRepository customerRepository, @Value("${stripe.key.secret}") String secretKey) {
         this.customerRepository = customerRepository;
 
-        //initialize Stripe API  with secret key
+        //initialize Stripe API with secret key
         Stripe.apiKey = secretKey;
     }
 
-    //retrieve the order info from dto
-    //generate tracking number
-    //populate order with orderItems
-    //populate order with billingAddress and shippingAddress
-    //populate customer with order
-    //save to the db
-    //return a response
     @Override
     @Transactional
     public PurchaseResponse placeOrder(Purchase purchase) {
-        Order order = purchase.getOrder();
+        try {
+            Order order = purchase.getOrder();
+            System.out.println("Order: " + order); // Log pentru verificare
 
-        String orderTrackingNumber = generateOrderTrackingNumber();
-        order.setOrderTrackingNumber(orderTrackingNumber);
+            String orderTrackingNumber = generateOrderTrackingNumber();
+            order.setOrderTrackingNumber(orderTrackingNumber);
 
-        Set<OrderItem> orderItems = purchase.getOrderItems();
-        orderItems.forEach(item -> order.add(item));
+            Set<OrderItem> orderItems = purchase.getOrderItems();
+            orderItems.forEach(order::add);
 
-        order.setShippingAddress(purchase.getShippingAddress());
-        order.setBillingAddress(purchase.getBillingAddress());
+            order.setShippingAddress(purchase.getShippingAddress());
+            order.setBillingAddress(purchase.getBillingAddress());
 
-        //populate customer with order
-        Customer customer = purchase.getCustomer();
+            Customer customer = purchase.getCustomer();
+            System.out.println("Customer: " + customer); // Log pentru verificare
 
-        //check if this is an existing custimer
-        String theEmail = customer.getEmail();
-        Customer customerFromDataBase = customerRepository.findByEmail(theEmail);
+            String theEmail = customer.getEmail();
+            Customer customerFromDataBase = customerRepository.findByEmail(theEmail);
 
-        if(customerFromDataBase != null){
-            //we found them and assign them accordingly
-            customer = customerFromDataBase;
+            if (customerFromDataBase != null) {
+                customer = customerFromDataBase;
+            }
+
+            customer.add(order);
+
+            customerRepository.save(customer);
+
+            return new PurchaseResponse(orderTrackingNumber);
+        } catch (Exception e) {
+            System.err.println("Error placing order: " + e.getMessage());
+            throw e;
         }
-
-        //save to the database
-        customer.add(order);
-
-        //return a response
-        customerRepository.save(customer);
-
-        return new PurchaseResponse(orderTrackingNumber);
     }
+
 
     @Override
     public PaymentIntent createPaymentIntent(PaymentInfo paymentInfo) throws StripeException {
-
         List<String> paymentMethodTypes = new ArrayList<>();
         paymentMethodTypes.add("card");
 
@@ -82,13 +77,15 @@ public class CheckoutServiceImpl implements CheckoutService {
         params.put("amount", paymentInfo.getAmount());
         params.put("currency", paymentInfo.getCurrency());
         params.put("payment_method_types", paymentMethodTypes);
+        params.put("description", "Comanda de pe site-ul Meetmountain");
+        params.put("receipt_email", paymentInfo.getReceiptEmail());
 
         return PaymentIntent.create(params);
     }
 
     private String generateOrderTrackingNumber() {
-
         //generate a random UUID number(universaly unique id)
         return UUID.randomUUID().toString();
     }
 }
+
